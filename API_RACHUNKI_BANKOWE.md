@@ -659,7 +659,16 @@ Niezależnie od poziomu zabezpieczeń, faktura zawsze otrzymuje domyślne rachun
 | `422` | `account_description` dłuższe niż 256 znaków | `{"code": "error", "message": {"account_description": ["is too long (maximum is 256 characters)"]}}` |
 | `422` | Nieprawidłowa wartość `own_bank_account_type` | `{"code": "error", "message": {"own_bank_account_type": ["is not included in the list"]}}` |
 | `422` | Próba ustawienia `buyer_mass_payment_code` przy `security != none` dla klienta bez kodu | `422 Unprocessable Entity` |
+| `422` | Konto z włączonym KSeF: zmiana `bank_swift` na wartość o niepoprawnym formacie (CRUD rachunków) | `{"code": "error", "message": {"bank_swift": ["- jest nieprawidłowe"]}}` |
+| `422` | Konto z włączonym KSeF: zmiana `bank_account_number` na numer krótszy niż 10 znaków bez spacji (CRUD rachunków) | `{"code": "error", "message": {"bank_account_number": ["- pole jest za krótkie (minimalna ilość znaków: 10)"]}}` |
 | `404` | Rachunek bankowy nie istnieje (CRUD) | `{"code": "error", "message": "Not found"}` |
+
+### Walidacje na koncie z włączonym KSeF
+
+Obie walidacje działają tylko na koncie z włączonym KSeF i tylko wtedy, gdy żądanie zmienia daną wartość na rachunku. Na koncie bez KSeF `bank_swift` w dowolnym formacie zapisuje się bez błędu, a numer rachunku musi mieć co najmniej 7 znaków (liczonych razem ze spacjami).
+
+- **`bank_swift`** — format 8 lub 11 znaków (np. `BREXPLPW` albo `BREXPLPWXXX`). Rachunek z wcześniej zapisanym SWIFT-em w innym formacie można edytować (nazwa, opis, waluta) bez poprawiania SWIFT-u.
+- **`bank_account_number`** — minimum 10 znaków liczone po usunięciu spacji, więc `12 34 56 78` (8 znaków) zwraca `422`. Rachunek z krótszym numerem zapisanym wcześniej można edytować bez zmiany numeru.
 
 ---
 
